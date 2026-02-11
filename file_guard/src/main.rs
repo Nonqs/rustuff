@@ -1,5 +1,6 @@
 use notify::{Event, RecursiveMode, Result, Watcher};
 use std::{path::Path, sync::mpsc};
+use std::process::{Command, Stdio};
 
 fn main() -> Result<()> {
     let (tx, rx) = mpsc::channel::<Result<Event>>();
@@ -20,6 +21,14 @@ fn main() -> Result<()> {
                 if let Some(path) = event.paths.get(0) {
                     if let Some(nombre) = path.file_name() {
                         println!("File {:?}", nombre);
+                        let out = Command::new("stat")
+                        .arg(path)
+                        .output()
+                        .expect("error executing stat");
+
+                        
+                        let results = String::from_utf8_lossy(&out.stdout);
+                        println!("{}", results);
                     }
                 }
                 
